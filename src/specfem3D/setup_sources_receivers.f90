@@ -852,6 +852,14 @@
     t0      = 0.d0
   endif
 
+  if (USE_SINSQ_STF) then
+    t0 = 0.d0
+    if(NSOURCES > 1) write(*,*)'WARNING: USE_SINSQ_STF not tested for NSOURCES > 1'
+    do isource = 1,NSOURCES
+      t0 = - min(t0,tshift_src(isource) - hdur(isource))
+    enddo 
+  endif 
+
   ! checks if user set USER_T0 to fix simulation start time
   ! note: USER_T0 has to be positive
   if (USER_T0 > 0.d0) then

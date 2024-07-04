@@ -491,7 +491,7 @@
 
 ! returns source time function value for specified time
 
-  use specfem_par, only: USE_FORCE_POINT_SOURCE,USE_MONOCHROMATIC_CMT_SOURCE,force_stf,hdur,hdur_Gaussian
+  use specfem_par, only: USE_FORCE_POINT_SOURCE,USE_MONOCHROMATIC_CMT_SOURCE,force_stf,hdur,hdur_Gaussian,USE_SINSQ_STF
 
   implicit none
 
@@ -539,7 +539,9 @@
     if (USE_MONOCHROMATIC_CMT_SOURCE) then
       f0 = 1.d0 / hdur(isource) ! using half duration as a FREQUENCY just to avoid changing CMTSOLUTION file format
       stf = comp_source_time_function_mono(time_source_dble,f0)
-    else
+    elseif (USE_SINSQ_STF) then
+      stf = comp_source_time_function(time_source_dble,hdur(isource),it_index)
+    else 
       stf = comp_source_time_function(time_source_dble,hdur_Gaussian(isource),it_index)
     endif
   endif

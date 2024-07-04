@@ -37,7 +37,7 @@
   integer, parameter :: nparam_i = 50
   integer, dimension(nparam_i) :: bcast_integer
 
-  integer, parameter :: nparam_l = 74
+  integer, parameter :: nparam_l = 75
   logical, dimension(nparam_l) :: bcast_logical
 
   integer, parameter :: nparam_dp = 42
@@ -111,7 +111,7 @@
             OUTPUT_SEISMOS_3D_ARRAY, &
             REGIONAL_MESH_CUTOFF,REGIONAL_MESH_ADD_2ND_DOUBLING, &
             EMC_MODEL, &
-            FULL_GRAVITY /)
+            FULL_GRAVITY,USE_SINSQ_STF/)
 
     bcast_double_precision = (/ &
             DT, &
@@ -350,6 +350,7 @@
     REGIONAL_MESH_ADD_2ND_DOUBLING = bcast_logical(72)
     EMC_MODEL = bcast_logical(73)
     FULL_GRAVITY = bcast_logical(74)
+    USE_SINSQ_STF = bcast_logical(75)
 
     ! double precisions
     DT = bcast_double_precision(1)

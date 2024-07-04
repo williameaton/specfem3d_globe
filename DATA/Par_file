@@ -266,6 +266,10 @@ USE_FORCE_POINT_SOURCE          = .false.
 # default is .false. which uses Heaviside function
 USE_MONOCHROMATIC_CMT_SOURCE    = .false.
 
+# uses a sin-squared STF useful for PEGS calculations
+# see https://doi.org/10.1016/j.epsl.2020.116150 for definition
+USE_SINSQ_STF                   = .false.
+
 # print source time function
 PRINT_SOURCE_TIME_FUNCTION      = .false.
 

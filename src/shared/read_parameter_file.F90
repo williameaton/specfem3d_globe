@@ -216,6 +216,11 @@
   call read_value_logical(USE_FORCE_POINT_SOURCE, 'USE_FORCE_POINT_SOURCE', ier)
   if (ier /= 0) stop 'an error occurred while reading the parameter file: USE_FORCE_POINT_SOURCE'
 
+  ! sin squared STF - used for PEGS
+  call read_value_logical(USE_SINSQ_STF, 'USE_SINSQ_STF', ier)
+  if (ier /= 0) stop 'an error occurred while reading the parameter file: USE_SINSQ_STF'
+
+
   ! monochromatic double couple source
   call read_value_logical(USE_MONOCHROMATIC_CMT_SOURCE, 'USE_MONOCHROMATIC_CMT_SOURCE', ier)
   if (ier /= 0) stop 'an error occurred while reading the parameter file: USE_MONOCHROMATIC_CMT_SOURCE'
