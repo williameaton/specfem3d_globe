@@ -1784,6 +1784,12 @@
     if (SIMULATION_TYPE == 1 .or. SIMULATION_TYPE == 3) then
       allocate(seismograms(NDIM,nrec_local,nlength_seismogram),stat=ier)
       if (ier /= 0) stop 'Error while allocating seismograms'
+
+      if (FULL_GRAVITY_VAL) then 
+        allocate(seismograms_a(NDIM,nrec_local,nlength_seismogram),stat=ier)
+        if (ier /= 0) stop 'Error while allocating seismograms_a'
+      endif
+
     else
       ! adjoint seismograms
       allocate(seismograms(NDIM*NDIM,nrec_local,nlength_seismogram),stat=ier)
@@ -1804,6 +1810,9 @@
 
     ! initializes seismograms
     seismograms(:,:,:) = 0._CUSTOM_REAL
+    if (FULL_GRAVITY_VAL) then 
+      seismograms_a(:,:,:) = 0._CUSTOM_REAL
+    endif 
 
   else
     ! dummy arrays

@@ -86,7 +86,7 @@
 
   use specfem_par_crustmantle, only: ibool_crust_mantle
 
-  use specfem_par_full_gravity, only: scale_pgrav
+  use specfem_par_full_gravity, only: scale_phi
 
   implicit none
 
@@ -121,7 +121,7 @@
 
     ! store North, East and Vertical components
     ! distinguish between single and double precision for reals
-    seismograms(:,irec_local,seismo_current) = real(scale_pgrav * phir,kind=CUSTOM_REAL)
+    seismograms(:,irec_local,seismo_current) = real(scale_phi * phir,kind=CUSTOM_REAL)
   enddo
 
   end subroutine SIEM_compute_seismograms_phi
@@ -147,7 +147,7 @@
     etax_crust_mantle, etay_crust_mantle, etaz_crust_mantle, &
     gammax_crust_mantle, gammay_crust_mantle, gammaz_crust_mantle
 
-  use specfem_par_full_gravity, only: scale_pgrav
+  use specfem_par_full_gravity, only: scale_pgrav, scale_hgrav
 
   implicit none
 
@@ -286,7 +286,7 @@
       eps_loc_rot(:,:) = real(matmul(nu_rec(:,:,irec), Hgrav_rec(:,:)),kind=CUSTOM_REAL)
       eps_loc_new(:,:) = real(matmul(eps_loc_rot(:,:), transpose(nu_rec(:,:,irec))),kind=CUSTOM_REAL)
 
-      seismograms_Hgrav(:,:,irec_local,seismo_current) = real(scale_pgrav * eps_loc_new(:,:),kind=CUSTOM_REAL)
+      seismograms_Hgrav(:,:,irec_local,seismo_current) = real(scale_hgrav * eps_loc_new(:,:),kind=CUSTOM_REAL)
 
       ! original: misses P' projection for rotation
       !do m = 1,3

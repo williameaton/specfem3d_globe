@@ -378,6 +378,8 @@ module specfem_par
 
   ! seismograms
   real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: seismograms
+  ! acceleration seismograms
+  real(kind=CUSTOM_REAL), dimension(:,:,:), allocatable :: seismograms_a
 
   integer :: nlength_seismogram
   integer :: seismo_offset, seismo_current
@@ -1133,7 +1135,7 @@ module specfem_par_full_gravity
   implicit none
 
   ! non-dimensionalization
-  double precision :: scale_accel,scale_pgrav
+  double precision :: scale_accel, scale_pgrav, scale_phi, scale_hgrav
 
   ! seismograms
   ! perturbed gravitational potential
@@ -1382,6 +1384,10 @@ module specfem_par_full_gravity
 
   ! for the adjoint Euler scheme for rotation in linear indexing for 3-GLLX points
   real(kind=CUSTOM_REAL),dimension(:,:), allocatable :: b_A_array_rotationL3, b_B_array_rotationL3
+  
+
+  ! testing
+  logical :: output_background_grav_siem_for_testing = .false.
 
 end module specfem_par_full_gravity
 

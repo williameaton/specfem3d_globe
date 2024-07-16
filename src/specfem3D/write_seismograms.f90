@@ -35,7 +35,7 @@
     nrec_local,number_receiver_global,ispec_selected_rec,ispec_selected_source, &
     it,it_end, &
     seismo_current,seismo_offset, &
-    seismograms, &
+    seismograms, seismograms_a, &
     nlength_seismogram, &
     NTSTEP_BETWEEN_OUTPUT_SEISMOS,NTSTEP_BETWEEN_OUTPUT_SAMPLE, &
     do_save_seismograms, &
@@ -44,10 +44,12 @@
     moment_der,sloc_der,shdur_der,stshift_der, &
     scale_displ
 
-  use specfem_par_crustmantle, only: displ_crust_mantle,b_displ_crust_mantle, &
+  use specfem_par_crustmantle, only: displ_crust_mantle,accel_crust_mantle,b_displ_crust_mantle, &
     eps_trace_over_3_crust_mantle,epsilondev_xx_crust_mantle,epsilondev_xy_crust_mantle,epsilondev_xz_crust_mantle, &
     epsilondev_yy_crust_mantle,epsilondev_yz_crust_mantle, &
     ibool_crust_mantle
+
+  use specfem_par_full_gravity, only: scale_accel
 
   implicit none
 
@@ -100,8 +102,12 @@
       case (1)
         ! forward run
         if (.not. GPU_MODE) then
-          ! on CPU
-          call compute_seismograms(NGLOB_CRUST_MANTLE,displ_crust_mantle,seismo_current,seismograms)
+          ! on CPU 
+          call compute_seismograms(NGLOB_CRUST_MANTLE,displ_crust_mantle,seismo_current,seismograms,scale_displ)
+          ! Full gravity useful to have acceleration outputted
+          if (FULL_GRAVITY_VAL) then 
+            call compute_seismograms(NGLOB_CRUST_MANTLE,accel_crust_mantle,seismo_current,seismograms_a,scale_accel)
+          endif 
         else
           ! on GPU
           call compute_seismograms_gpu(Mesh_pointer,seismograms,seismo_current,it,it_end,scale_displ,nlength_seismogram)
@@ -120,10 +126,10 @@
           ! on CPU
           if (OUTPUT_ADJOINT_WAVEFIELD_SEISMOGRAMS) then
             ! uncomment to output adjoint wavefield instead for seismogram output
-            call compute_seismograms(NGLOB_CRUST_MANTLE_ADJOINT,displ_crust_mantle,seismo_current,seismograms)
+            call compute_seismograms(NGLOB_CRUST_MANTLE_ADJOINT,displ_crust_mantle,seismo_current,seismograms, scale_displ)
           else
             ! default, backward reconstructed wavefield seismos
-            call compute_seismograms(NGLOB_CRUST_MANTLE_ADJOINT,b_displ_crust_mantle,seismo_current,seismograms)
+            call compute_seismograms(NGLOB_CRUST_MANTLE_ADJOINT,b_displ_crust_mantle,seismo_current,seismograms,scale_displ)
           endif
         else
           ! on GPU
@@ -186,6 +192,7 @@
           ! displacement (seismograms)
           call write_seismograms_to_file(1)
           if (FULL_GRAVITY_VAL) then
+            call write_seismograms_to_file(3) ! ground acceleration
             call write_seismograms_to_file(5) ! seismograms_phi
             call write_seismograms_to_file(6) ! seismograms_pgrav
             call write_seismograms_to_file(7) ! seismograms_grav
@@ -279,7 +286,7 @@
   case (2)
     component = 'v'   ! velocity - not used yet...
   case (3)
-    component = 'a'   ! acceleration - not used yet...
+    component = 'a'   ! acceleration 
   case (4)
     component = 'p'   ! pressure - not used yet...
   case (5)
@@ -555,7 +562,7 @@ contains
   subroutine get_single_trace(istore,irec_local,one_seismogram)
 
   use constants, only: NDIM,CUSTOM_REAL
-  use specfem_par, only: seismograms,nlength_seismogram,seismo_current
+  use specfem_par, only: seismograms,seismograms_a, nlength_seismogram,seismo_current
   use specfem_par_full_gravity, only: seismograms_phi,seismograms_pgrav,seismograms_grav,seismograms_corio
 
   implicit none
@@ -585,11 +592,9 @@ contains
     continue
   case (3)
     ! acceleration
-    !do i = 1,seismo_current
-    !  one_seismogram(:,i) = seismograms_a(:,irec_local,i)
-    !enddo
-    ! not used yet...
-    continue
+    do i = 1,seismo_current
+      one_seismogram(:,i) = seismograms_a(:,irec_local,i)
+    enddo
   case (4)
     ! pressure
     !do i = 1,seismo_current
@@ -716,7 +721,16 @@ contains
     ! single component only for pressure & gravitational potential
     if (istore == 4 .or. istore == 5) then
       chn = bic(1:2)//'P'
+    elseif (istore == 2) then 
+      ! Velocity
+      chn = chn(1:3)//'V'
+    elseif (istore == 3) then
+      ! Acceleration
+      chn = chn(1:3)//'A'
     endif
+
+    
+
 
     ! backazimuth rotation
     if (iorientation == 4 .or. iorientation == 5) then
@@ -783,6 +797,17 @@ contains
     ! create this name also for the text line added to the unique big seismogram file
     write(sisname_big_file,"(a,'.',a,'.',a3,'.sem')") network_name(irec)(1:length_network_name), &
                    station_name(irec)(1:length_station_name),chn
+
+    if(istore == 3) then 
+
+      write(sisname,"('/',a,'.',a,'.',a4,'.sem')") network_name(irec)(1:length_network_name), &
+      station_name(irec)(1:length_station_name),chn
+
+      ! create this name also for the text line added to the unique big seismogram file
+      write(sisname_big_file,"(a,'.',a,'.',a4,'.sem')") network_name(irec)(1:length_network_name), &
+            station_name(irec)(1:length_station_name),chn
+    endif 
+
 
     ! full gravity seismos add an additional component indicator to the name
     if (istore > 4) then

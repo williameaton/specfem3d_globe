@@ -26,14 +26,14 @@
 !=====================================================================
 
 
-  subroutine compute_seismograms(nglob,displ,seismo_current,seismograms)
+  subroutine compute_seismograms(nglob,displ,seismo_current,seismograms, scale)
 
   use constants_solver
 
   use specfem_par, only: &
     nlength_seismogram, &
     nrec_local,nu_rec,ispec_selected_rec,number_receiver_global, &
-    scale_displ,hxir_store,hetar_store,hgammar_store
+    hxir_store,hetar_store,hgammar_store
 
   use specfem_par_crustmantle, only: ibool_crust_mantle
 
@@ -41,7 +41,7 @@
 
   integer,intent(in) :: nglob
   real(kind=CUSTOM_REAL), dimension(NDIM,nglob),intent(in) :: displ
-
+  double precision, intent(in) :: scale
   integer,intent(in) :: seismo_current
 
   real(kind=CUSTOM_REAL), dimension(NDIM,nrec_local,nlength_seismogram),intent(out) :: &
@@ -81,9 +81,9 @@
 
     ! store North, East and Vertical components
     ! distinguish between single and double precision for reals
-    seismograms(:,irec_local,seismo_current) = real(scale_displ*(nu_rec(:,1,irec)*uxd + &
-                                                                 nu_rec(:,2,irec)*uyd + &
-                                                                 nu_rec(:,3,irec)*uzd), &
+    seismograms(:,irec_local,seismo_current) = real(scale*(nu_rec(:,1,irec)*uxd + &
+                                                           nu_rec(:,2,irec)*uyd + &
+                                                           nu_rec(:,3,irec)*uzd), &
                                                     kind=CUSTOM_REAL)
 
   enddo
