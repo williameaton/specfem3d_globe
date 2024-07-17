@@ -1628,7 +1628,7 @@
   ! strain is defined as second time integral 
   ! of grad grad phi here we just output 
   ! grad grad phi so scale by units of 1/s^2  
-  scale_hgrav = scale_displ * scale_t_inv**2     ! [1 / s^2] 
+  scale_hgrav =  scale_t_inv**2     ! [1 / s^2] 
 
 
   ! allocate seismogram array
