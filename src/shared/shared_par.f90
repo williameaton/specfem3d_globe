@@ -105,7 +105,7 @@
 
   ! full gravity support
   logical :: FULL_GRAVITY = .false.
-  integer :: POISSON_SOLVER = 0   ! 0 == builtin / 1 == PETSc solver
+  integer :: POISSON_SOLVER = 0   ! 0 == builtin / 1 == PETSc / 2 == hyperbolic solver
 
   ! regional mesh cut-off
   logical :: REGIONAL_MESH_CUTOFF = .false.

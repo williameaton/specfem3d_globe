@@ -1435,10 +1435,36 @@
 !!-----------------------------------------------------------
 
 ! maximum number of iteration for conjugate gradient solver
-  integer, parameter :: ISOLVER_BUILTIN = 0, ISOLVER_PETSC = 1
+  integer, parameter :: ISOLVER_BUILTIN = 0, ISOLVER_PETSC = 1, ISOLVER_HYPERBOLIC = 2
 
 ! Level-2 solver
   logical, parameter :: USE_POISSON_SOLVER_5GLL = .false.
+
+!!-----------------------------------------------------------
+!!
+!! Hyperbolic (damped-wave) gravity solver, POISSON_SOLVER == 2
+!!
+!!-----------------------------------------------------------
+
+! artificial gravity propagation speed, cg = HYPERBOLIC_KG * (max P velocity of the mesh).
+! tying cg to the fastest seismic wave makes 1/HYPERBOLIC_KG**2 an upper bound on the
+! relative error for every mode, while the cost scales linearly with HYPERBOLIC_KG,
+! so ~20-45 bounds the error at ~0.25%-0.05%
+  double precision, parameter :: HYPERBOLIC_KG = 20.d0
+
+! damping rate, kappa = HYPERBOLIC_KAPPA * cg / R_outer.
+! kappa ~ pi critically damps the gravest artificial mode of the finite domain;
+! Maeda et al. (2024) find ~2.5 optimal
+  double precision, parameter :: HYPERBOLIC_KAPPA = 2.5d0
+
+! Courant safety factor applied to the sub-step
+  double precision, parameter :: HYPERBOLIC_CFL = 0.7d0
+
+! multiplier on the pseudo-mass given to the infinite-element degrees of freedom
+  double precision, parameter :: HYPERBOLIC_MASS_INF = 1.d0
+
+! power iterations used to estimate the largest eigenvalue of M^-1 K
+  integer, parameter :: HYPERBOLIC_NPOWER = 50
 
 ! If the following parameter is .true., contribution of the perturbed gravity is discarded in compute force routines
 ! (perturbed gravity is still computed from the density perturbation)

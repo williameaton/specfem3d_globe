@@ -127,6 +127,7 @@ specfem3D_SOLVER_OBJECTS += \
 	$O/read_topography_bathymetry.solverstatic.o \
 	$O/SIEM_compute_kernels.solverstatic.o \
 	$O/SIEM_compute_seismograms.solverstatic.o \
+	$O/SIEM_hyperbolic.solverstatic.o \
 	$O/SIEM_index_region.solverstatic.o \
 	$O/SIEM_infinite_element.solverstatic.o \
 	$O/SIEM_poisson.solverstatic.o \
@@ -456,11 +457,15 @@ $O/SIEM_compute_kernels.solverstatic.o: $O/SIEM_math_library.shared.o $O/SIEM_po
 																				$O/SIEM_solver_petsc.solverstatic.o $O/SIEM_solver_mpi.solverstatic.o
 $O/SIEM_infinite_element.solverstatic.o: $O/SIEM_math_library.shared.o
 $O/SIEM_poisson.solverstatic.o: $O/SIEM_math_library.shared.o $O/SIEM_infinite_element.solverstatic.o
+$O/SIEM_hyperbolic.solverstatic.o: $O/SIEM_math_library.shared.o $O/SIEM_poisson.solverstatic.o \
+																$O/SIEM_solver_mpi.solverstatic.o
 $O/SIEM_prepare_iteration.solverstatic.o: $O/SIEM_math_library.shared.o $O/SIEM_poisson.solverstatic.o \
-																$O/SIEM_solver_petsc.solverstatic.o $O/SIEM_solver_mpi.solverstatic.o
+																$O/SIEM_solver_petsc.solverstatic.o $O/SIEM_solver_mpi.solverstatic.o \
+																$O/SIEM_hyperbolic.solverstatic.o
 $O/SIEM_prepare_solver.solverstatic.o: $O/SIEM_math_library.shared.o $O/SIEM_poisson.solverstatic.o
 $O/SIEM_solve.solverstatic.o: $O/SIEM_math_library.shared.o $O/SIEM_poisson.solverstatic.o \
-															$O/SIEM_solver_petsc.solverstatic.o $O/SIEM_solver_mpi.solverstatic.o
+															$O/SIEM_solver_petsc.solverstatic.o $O/SIEM_solver_mpi.solverstatic.o \
+															$O/SIEM_hyperbolic.solverstatic.o
 $O/SIEM_solver_mpi.solverstatic.o: $O/SIEM_math_library.shared.o
 $O/SIEM_solver_petsc.solverstatic.o: $O/SIEM_math_library.shared.o
 $O/SIEM_compute_seismograms.solverstatic.o: $O/SIEM_math_library.shared.o

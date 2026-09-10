@@ -64,9 +64,11 @@
       endif
     else if (POISSON_SOLVER == ISOLVER_PETSC) then
       write(IMAIN,*) "  Poisson solver: PETSc"
+    else if (POISSON_SOLVER == ISOLVER_HYPERBOLIC) then
+      write(IMAIN,*) "  Poisson solver: HYPERBOLIC (damped wave)"
     else
       write(IMAIN,*) "  Poisson solver: unknown"
-      call exit_MPI(myrank,'Error Poisson solver invalid, POISSON_SOLVER must be 0 or 1')
+      call exit_MPI(myrank,'Error Poisson solver invalid, POISSON_SOLVER must be 0, 1 or 2')
     endif
     if (USE_POISSON_SOLVER_5GLL) then
       write(IMAIN,*) "  using Level-1 and Level-2 solver"

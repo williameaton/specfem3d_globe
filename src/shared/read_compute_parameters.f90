@@ -653,8 +653,8 @@
   if (.not. FULL_GRAVITY) return
 
   ! checks solver setting
-  if (POISSON_SOLVER /= 0 .and. POISSON_SOLVER /= 1) &
-    stop 'For FULL_GRAVITY calculations, POISSON_SOLVER must be set to either 0 == builtin or 1 == PETSc'
+  if (POISSON_SOLVER /= 0 .and. POISSON_SOLVER /= 1 .and. POISSON_SOLVER /= 2) &
+    stop 'For FULL_GRAVITY calculations, POISSON_SOLVER must be 0 == builtin, 1 == PETSc or 2 == hyperbolic'
 
   ! start region
   iregion0 = IREGION_CRUST_MANTLE

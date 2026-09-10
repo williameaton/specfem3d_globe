@@ -51,6 +51,10 @@ module siem_solver_mpi
   public :: diagpcg_solver3
   public :: interpolate3to5
 
+  ! exposed for the hyperbolic solver, which reuses the MPI assembly without the
+  ! conjugate-gradient iteration around it
+  public :: scatter_and_assemble3
+
 contains
 
 !-------------------------------------------------------------------------------

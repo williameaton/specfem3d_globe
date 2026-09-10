@@ -37,6 +37,8 @@
                                petsc_set_matrix1,petsc_set_matrix, &
                                petsc_zero_initialguess1,petsc_zero_backwards_initialguess1
 
+  use siem_hyperbolic, only: hyperbolic_prepare
+
   implicit none
   integer :: ier
 
@@ -78,12 +80,21 @@
     endif
   endif
 
+  if (POISSON_SOLVER == ISOLVER_HYPERBOLIC) then
+    ! hyperbolic (damped-wave) solver
+    call hyperbolic_prepare()
+  endif
+
   ! compute background gravity by using spectral-infinite-element method
   ! Note that the background gravity is already computed by using semi-analytical
   ! method in make_gravity.f90
   ! compute background gravitational field only once
   ! WARNING: We have not currently using this for the time marching.
-  if (NUMBER_OF_THIS_RUN == 1) call SIEM_compute_background_gravity()
+  ! (skipped for the hyperbolic solver: this diagnostic needs the stored element
+  !  stiffness matrices, which that solver releases in favour of a matrix-free operator)
+  if (NUMBER_OF_THIS_RUN == 1 .and. POISSON_SOLVER /= ISOLVER_HYPERBOLIC) then
+    call SIEM_compute_background_gravity()
+  endif
 
   ! initialize for dynamic solver
   pgrav1(:) = 0.0_CUSTOM_REAL

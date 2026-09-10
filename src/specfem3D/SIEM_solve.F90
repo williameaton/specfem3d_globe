@@ -28,9 +28,19 @@
 
   subroutine SIEM_solve_poisson()
 
-  use specfem_par, only: SIMULATION_TYPE
+  use constants, only: ISOLVER_HYPERBOLIC
+
+  use specfem_par, only: SIMULATION_TYPE,POISSON_SOLVER
+
+  use siem_hyperbolic, only: hyperbolic_solve
 
   implicit none
+
+  ! hyperbolic solver relaxes towards the Poisson solution instead of inverting it
+  if (POISSON_SOLVER == ISOLVER_HYPERBOLIC) then
+    call hyperbolic_solve()
+    return
+  endif
 
   ! forward wavefield
   call solve_poisson_equation()

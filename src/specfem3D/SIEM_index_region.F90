@@ -108,7 +108,7 @@
   logical,dimension(:),allocatable :: isnode_ic,isnode_oc,isnode_cm,isnode_trinf,isnode_inf
   integer,allocatable :: nf(:,:),nf1(:,:),nmir(:)
 
-  integer :: inode1,inum,igll
+  integer :: inode1,inum,igll,igll_stride
   logical,allocatable :: isnode(:)
 
   logical,allocatable :: isibool_interface_ic(:,:),isibool_interface_oc(:,:), &
@@ -564,23 +564,28 @@
 
   !-------------------------------------------------------------------------------
 
-  ! WARNING: ONLY APPLICABLE FOR 5 TO 3 SOLVER
-  if (NGLLX /= 5 .or. NGLLY /= 5 .or. NGLLZ /= 5 .or. &
-      NGLLX_INF /= 3 .or. NGLLY_INF /= 3 .or. NGLLZ_INF /= 3) then
+  ! the Level-1 points are taken as an evenly strided subset of the Level-2 ones,
+  ! which requires the element degrees to divide (e.g. 5 to 3 gives stride 2)
+  if (NGLLX /= NGLLY .or. NGLLX /= NGLLZ .or. &
+      NGLLX_INF /= NGLLY_INF .or. NGLLX_INF /= NGLLZ_INF .or. &
+      NGLLX_INF < 2 .or. mod(NGLLX-1,NGLLX_INF-1) /= 0) then
     print *,'Error: invalid NGLL setting for SIEM indexing'
-    print *,'       NGLLX/NGLLY/NGLLZ = ',NGLLX,NGLLY,NGLLZ, ' - all must be equal to 5 for SIEM'
-    print *,'       NGLLX_INF/NGLLY_INF/NGLLZ_INF = ',NGLLX_INF,NGLLY_INF,NGLLZ_INF,' - all must be equal to 3 for SIEM'
-    stop 'SIEM indexing only works for NGLLX == 5 and NGLLX_INF == 3 setting for now!'
+    print *,'       NGLLX/NGLLY/NGLLZ = ',NGLLX,NGLLY,NGLLZ, ' - all must be equal'
+    print *,'       NGLLX_INF/NGLLY_INF/NGLLZ_INF = ',NGLLX_INF,NGLLY_INF,NGLLZ_INF,' - all must be equal'
+    print *,'       and NGLLX-1 must be divisible by NGLLX_INF-1'
+    stop 'Invalid NGLL / NGLL_INF combination for SIEM indexing!'
   endif
+
+  igll_stride = (NGLLX-1) / (NGLLX_INF-1)
 
   ! Level-1 solver---------------
   ! count nodes for 1st level solver
   ! active GLL points
   is_active_gll(:) = .false.
   inum = 0
-  do k = 1,NGLLZ,2
-    do j = 1,NGLLY,2
-      do i = 1,NGLLX,2     ! 1,3,5
+  do k = 1,NGLLZ,igll_stride
+    do j = 1,NGLLY,igll_stride
+      do i = 1,NGLLX,igll_stride     ! 1,3,5 for the 5-to-3 case
         inum = inum+1
         igll = NGLLY*NGLLX*(k-1)+NGLLX*(j-1)+i    ! 1,3,5,(5+1),(5+3),(5+5),..
         is_active_gll(igll) = .true.
